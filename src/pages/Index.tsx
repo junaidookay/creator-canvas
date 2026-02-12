@@ -1,5 +1,6 @@
 import HeroSection from '@/components/home/HeroSection';
 import VideoCard from '@/components/video/VideoCard';
+import { Link } from 'react-router-dom';
 import AdSlot from '@/components/ads/AdSlot';
 import { Button } from '@/components/ui/button';
 import { Flame, TrendingUp, Users, Layers } from 'lucide-react';
@@ -65,17 +66,18 @@ const Index = () => (
       </div>
       <div className="flex gap-4 overflow-x-auto pb-2">
         {MOCK_CREATORS.map(c => (
-          <motion.div
-            key={c.name}
-            whileHover={{ y: -4 }}
-            className="shrink-0 w-40 rounded-xl bg-card border border-border p-5 text-center hover:border-primary/30 transition-colors cursor-pointer"
-          >
-            <div className="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-lg font-bold" style={{ background: c.color, color: 'hsl(225 30% 5%)' }}>
-              {c.initial}
-            </div>
-            <p className="font-semibold text-foreground text-sm mb-1">{c.name}</p>
-            <p className="text-xs text-muted-foreground">{c.followers} followers</p>
-          </motion.div>
+          <Link key={c.name} to={`/channel/${c.name}`}>
+            <motion.div
+              whileHover={{ y: -4 }}
+              className="shrink-0 w-40 rounded-xl bg-card border border-border p-5 text-center hover:border-primary/30 transition-colors cursor-pointer"
+            >
+              <div className="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-lg font-bold" style={{ background: c.color, color: 'hsl(225 30% 5%)' }}>
+                {c.initial}
+              </div>
+              <p className="font-semibold text-foreground text-sm mb-1">{c.name}</p>
+              <p className="text-xs text-muted-foreground">{c.followers} followers</p>
+            </motion.div>
+          </Link>
         ))}
       </div>
     </section>
