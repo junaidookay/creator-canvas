@@ -1,8 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, Upload, Menu, X, Settings, LogOut, User, LayoutDashboard, Rss } from 'lucide-react';
+import { Search, Upload, Menu, X, Settings, LogOut, User, LayoutDashboard, Rss, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
@@ -10,6 +11,7 @@ import {
 const Navbar = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState('');
 
@@ -36,6 +38,15 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Sun className="w-5 h-5 hidden dark:block" />
+            <Moon className="w-5 h-5 block dark:hidden" />
+          </Button>
           {user ? (
             <>
               <Button variant="ghost" size="sm" onClick={() => navigate('/feed')} className="text-muted-foreground hover:text-foreground">

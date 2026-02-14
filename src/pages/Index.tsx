@@ -3,7 +3,7 @@ import VideoCard from '@/components/video/VideoCard';
 import { Link } from 'react-router-dom';
 import AdSlot from '@/components/ads/AdSlot';
 import { Button } from '@/components/ui/button';
-import { Flame, TrendingUp, Users, Layers } from 'lucide-react';
+import { Flame, TrendingUp, Users, Layers, Star, Clock } from 'lucide-react';
 import { VIDEO_CATEGORIES } from '@/types/database';
 import { motion } from 'framer-motion';
 
@@ -18,12 +18,32 @@ const MOCK_TRENDING = [
   { id: '8', title: 'Pro Workout Routine - Full Body HIIT', creator: 'FitnessPro', views: '201K', date: '2d ago', category: 'Fitness', gradient: 'linear-gradient(135deg, hsl(0 70% 45%), hsl(38 92% 55%))' },
 ];
 
+const MOCK_POPULAR = [
+  { id: '9', title: 'Lo-Fi Beats to Code To - Live Stream Archive', creator: 'SonicWave', views: '520K', date: '3w ago', category: 'Music', gradient: 'linear-gradient(135deg, hsl(260 50% 40%), hsl(300 60% 45%))' },
+  { id: '13', title: 'Minimalist Interior Design Tour - Tokyo Apartments', creator: 'GlobeTrotter', views: '178K', date: '1w ago', category: 'Lifestyle', gradient: 'linear-gradient(135deg, hsl(30 20% 45%), hsl(200 30% 40%))' },
+  { id: '14', title: 'Oil Painting Restoration - 200 Year Old Canvas', creator: 'ArtFlow', views: '412K', date: '2w ago', category: 'Art', gradient: 'linear-gradient(135deg, hsl(35 60% 40%), hsl(15 70% 35%))' },
+  { id: '15', title: 'Building a Smart Home from Scratch', creator: 'DevMaster', views: '234K', date: '5d ago', category: 'Technology', gradient: 'linear-gradient(135deg, hsl(170 60% 35%), hsl(210 70% 45%))' },
+];
+
+const MOCK_RECENT = [
+  { id: '16', title: 'Sunset Drone Flight Over Santorini', creator: 'UrbanLens', views: '12K', date: '6h ago', category: 'Travel', gradient: 'linear-gradient(135deg, hsl(15 80% 50%), hsl(45 90% 55%))' },
+  { id: '17', title: 'React Server Components Explained Simply', creator: 'DevMaster', views: '8K', date: '12h ago', category: 'Technology', gradient: 'linear-gradient(135deg, hsl(200 80% 40%), hsl(170 70% 40%))' },
+  { id: '18', title: 'Watercolor Landscape - Real Time Tutorial', creator: 'ArtFlow', views: '5K', date: '18h ago', category: 'Art', gradient: 'linear-gradient(135deg, hsl(190 50% 50%), hsl(140 40% 45%))' },
+  { id: '19', title: 'Morning Yoga Flow - 20 Min Session', creator: 'FitnessPro', views: '15K', date: '1d ago', category: 'Fitness', gradient: 'linear-gradient(135deg, hsl(280 40% 50%), hsl(320 50% 45%))' },
+  { id: '20', title: 'Japanese Street Food - Osaka Edition', creator: 'GlobeTrotter', views: '22K', date: '1d ago', category: 'Food', gradient: 'linear-gradient(135deg, hsl(0 60% 45%), hsl(30 80% 50%))' },
+  { id: '21', title: 'Synthwave Production Masterclass', creator: 'SonicWave', views: '18K', date: '1d ago', category: 'Music', gradient: 'linear-gradient(135deg, hsl(300 70% 40%), hsl(260 60% 50%))' },
+  { id: '22', title: 'Night Photography Tips - Low Light Magic', creator: 'FrameByFrame', views: '9K', date: '2d ago', category: 'Education', gradient: 'linear-gradient(135deg, hsl(240 40% 30%), hsl(200 60% 40%))' },
+  { id: '23', title: 'Pixel Art Game Assets - Speed Art', creator: 'PixelForge', views: '11K', date: '2d ago', category: 'Gaming', gradient: 'linear-gradient(135deg, hsl(130 60% 35%), hsl(80 70% 45%))' },
+];
+
 const MOCK_CREATORS = [
   { name: 'UrbanLens', followers: '12.5K', initial: 'U', color: 'hsl(200 80% 50%)' },
   { name: 'DevMaster', followers: '34.2K', initial: 'D', color: 'hsl(160 70% 45%)' },
   { name: 'ArtFlow', followers: '8.9K', initial: 'A', color: 'hsl(320 70% 50%)' },
   { name: 'SonicWave', followers: '45.1K', initial: 'S', color: 'hsl(280 60% 50%)' },
   { name: 'GlobeTrotter', followers: '21.3K', initial: 'G', color: 'hsl(38 92% 55%)' },
+  { name: 'FrameByFrame', followers: '15.7K', initial: 'F', color: 'hsl(225 50% 55%)' },
+  { name: 'PixelForge', followers: '19.8K', initial: 'P', color: 'hsl(120 50% 45%)' },
 ];
 
 const Index = () => (
@@ -56,6 +76,19 @@ const Index = () => (
       </div>
     </section>
 
+    {/* Popular All Time */}
+    <section className="container mx-auto px-4 mb-16">
+      <div className="flex items-center gap-2 mb-6">
+        <Star className="w-5 h-5 text-accent" />
+        <h2 className="text-xl font-bold text-foreground">Popular All Time</h2>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {MOCK_POPULAR.map(v => (
+          <VideoCard key={v.id} {...v} />
+        ))}
+      </div>
+    </section>
+
     <AdSlot slot="home-mid" format="horizontal" className="container mx-auto px-4 mb-8" />
 
     {/* Featured Creators */}
@@ -82,11 +115,24 @@ const Index = () => (
       </div>
     </section>
 
-    {/* Latest */}
+    {/* Latest Uploads — expanded */}
+    <section className="container mx-auto px-4 mb-16">
+      <div className="flex items-center gap-2 mb-6">
+        <Clock className="w-5 h-5 text-primary" />
+        <h2 className="text-xl font-bold text-foreground">Latest Uploads</h2>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {MOCK_RECENT.map(v => (
+          <VideoCard key={v.id} {...v} />
+        ))}
+      </div>
+    </section>
+
+    {/* More to Explore */}
     <section className="container mx-auto px-4 mb-16">
       <div className="flex items-center gap-2 mb-6">
         <TrendingUp className="w-5 h-5 text-primary" />
-        <h2 className="text-xl font-bold text-foreground">Latest Uploads</h2>
+        <h2 className="text-xl font-bold text-foreground">More to Explore</h2>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {MOCK_TRENDING.slice(4).map(v => (
