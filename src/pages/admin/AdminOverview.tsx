@@ -57,10 +57,10 @@ const AdminOverview = () => {
         supabase.from('videos').select('views'),
         supabase.from('comments').select('*', { count: 'exact', head: true }),
         supabase.from('posts').select('*', { count: 'exact', head: true }),
-        supabase.from('reports').select('*', { count: 'exact', head: true }),
+        db.from('reports').select('*', { count: 'exact', head: true }),
         supabase.from('likes').select('*', { count: 'exact', head: true }),
         supabase.from('videos').select('id, title, created_at, views, creator_id').order('created_at', { ascending: false }).limit(5),
-        supabase.from('reports').select('*').order('created_at', { ascending: false }).limit(5),
+        db.from('reports').select('*').order('created_at', { ascending: false }).limit(5),
       ]);
 
       const totalViews = viewsData?.reduce((sum, v) => sum + (v.views || 0), 0) ?? 0;

@@ -38,7 +38,7 @@ const AdminReports = () => {
   useEffect(() => { fetchReports(); }, [page, filter]);
 
   const resolveReport = async (id: string) => {
-    const { error } = await supabase.from('reports').update({ status: 'resolved', resolved_by: user?.id }).eq('id', id);
+    const { error } = await db.from('reports').update({ status: 'resolved', resolved_by: user?.id }).eq('id', id);
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
