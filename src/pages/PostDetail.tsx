@@ -44,7 +44,7 @@ const PostDetail = () => {
     setLikeCount(likes ?? 0);
 
     if (user) {
-      const { data: myLike } = await supabase.from('post_likes').select('id').eq('post_id', id).eq('user_id', user.id).maybeSingle();
+      const { data: myLike } = await db.from('post_likes').select('id').eq('post_id', id).eq('user_id', user.id).maybeSingle();
       setLiked(!!myLike);
     }
 
