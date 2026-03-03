@@ -17,6 +17,7 @@ import Admin from "./pages/Admin";
 import Settings from "./pages/Settings";
 import Feed from "./pages/Feed";
 import Channel from "./pages/Channel";
+import PostDetail from "./pages/PostDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/channel/:username" element={<Channel />} />
+            <Route path="/post/:id" element={<PostDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />

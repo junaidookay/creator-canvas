@@ -72,12 +72,75 @@ export type Database = {
           },
         ]
       }
+      post_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_likes: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           content: string
           created_at: string | null
           id: string
           image_url: string | null
+          is_hidden: boolean
+          updated_at: string | null
           user_id: string
         }
         Insert: {
@@ -85,6 +148,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           image_url?: string | null
+          is_hidden?: boolean
+          updated_at?: string | null
           user_id: string
         }
         Update: {
@@ -92,6 +157,8 @@ export type Database = {
           created_at?: string | null
           id?: string
           image_url?: string | null
+          is_hidden?: boolean
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -123,6 +190,39 @@ export type Database = {
           display_name?: string | null
           id?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          resolved_by: string | null
+          status: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          resolved_by?: string | null
+          status?: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          resolved_by?: string | null
+          status?: string
+          target_id?: string
+          target_type?: string
         }
         Relationships: []
       }
@@ -172,6 +272,8 @@ export type Database = {
           creator_id: string
           description: string | null
           id: string
+          is_disabled: boolean
+          is_featured: boolean
           storage_provider_ref: string | null
           storage_type: string | null
           tags: string[] | null
@@ -180,6 +282,7 @@ export type Database = {
           video_path: string | null
           video_url: string
           views: number | null
+          visibility: string
         }
         Insert: {
           category?: string | null
@@ -187,6 +290,8 @@ export type Database = {
           creator_id: string
           description?: string | null
           id?: string
+          is_disabled?: boolean
+          is_featured?: boolean
           storage_provider_ref?: string | null
           storage_type?: string | null
           tags?: string[] | null
@@ -195,6 +300,7 @@ export type Database = {
           video_path?: string | null
           video_url: string
           views?: number | null
+          visibility?: string
         }
         Update: {
           category?: string | null
@@ -202,6 +308,8 @@ export type Database = {
           creator_id?: string
           description?: string | null
           id?: string
+          is_disabled?: boolean
+          is_featured?: boolean
           storage_provider_ref?: string | null
           storage_type?: string | null
           tags?: string[] | null
@@ -210,6 +318,7 @@ export type Database = {
           video_path?: string | null
           video_url?: string
           views?: number | null
+          visibility?: string
         }
         Relationships: []
       }
@@ -218,7 +327,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
