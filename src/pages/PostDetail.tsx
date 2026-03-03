@@ -56,7 +56,7 @@ const PostDetail = () => {
   const toggleLike = async () => {
     if (!user || !id) return;
     if (liked) {
-      await supabase.from('post_likes').delete().eq('post_id', id).eq('user_id', user.id);
+      await db.from('post_likes').delete().eq('post_id', id).eq('user_id', user.id);
       setLiked(false);
       setLikeCount(c => c - 1);
     } else {
