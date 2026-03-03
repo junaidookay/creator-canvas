@@ -68,7 +68,7 @@ const PostDetail = () => {
 
   const submitComment = async () => {
     if (!user || !id || !commentText.trim()) return;
-    const { error } = await supabase.from('post_comments').insert({ post_id: id, user_id: user.id, content: commentText.trim() });
+    const { error } = await db.from('post_comments').insert({ post_id: id, user_id: user.id, content: commentText.trim() });
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
