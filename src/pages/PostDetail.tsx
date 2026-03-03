@@ -60,7 +60,7 @@ const PostDetail = () => {
       setLiked(false);
       setLikeCount(c => c - 1);
     } else {
-      await supabase.from('post_likes').insert({ post_id: id, user_id: user.id });
+      await db.from('post_likes').insert({ post_id: id, user_id: user.id });
       setLiked(true);
       setLikeCount(c => c + 1);
     }
