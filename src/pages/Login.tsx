@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
 const Login = () => {
-  const { signIn, configured } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -34,13 +34,6 @@ const Login = () => {
           <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
           <p className="text-sm text-muted-foreground mt-1">Sign in to your VSTREAM account</p>
         </div>
-
-        {!configured && (
-          <div className="mb-6 p-3 rounded-lg bg-accent/10 border border-accent/20 text-accent text-sm flex gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>Supabase not configured. <Link to="/settings" className="underline font-medium">Set up in Settings</Link> first.</span>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
