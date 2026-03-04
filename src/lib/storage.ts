@@ -1,4 +1,4 @@
-import { getSupabase } from './supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 export type StorageProvider = 'supabase' | 's3' | 'r2' | 'b2' | 'local';
 
@@ -39,7 +39,7 @@ export const uploadFile = async (
     case 'r2':
     case 'b2':
     case 'local':
-      throw new Error(`${provider} storage not yet configured. Set up in Settings.`);
+      throw new Error(`${provider} storage not yet configured. Set up in Admin Settings.`);
     default:
       throw new Error('Unknown storage provider');
   }
@@ -51,9 +51,6 @@ const uploadToSupabase = async (
   folder: string,
   onProgress?: (pct: number) => void
 ): Promise<UploadResult> => {
-  const supabase = getSupabase();
-  if (!supabase) throw new Error('Supabase not configured. Go to Settings.');
-
   const ext = file.name.split('.').pop();
   const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
@@ -69,8 +66,6 @@ const uploadToSupabase = async (
 };
 
 export const deleteFile = async (path: string, bucket: string) => {
-  const supabase = getSupabase();
-  if (!supabase) throw new Error('Supabase not configured');
   const { error } = await supabase.storage.from(bucket).remove([path]);
   if (error) throw error;
 };

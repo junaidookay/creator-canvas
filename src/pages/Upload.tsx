@@ -1,13 +1,13 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { uploadFile, validateFile, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES, MAX_VIDEO_SIZE, MAX_IMAGE_SIZE } from '@/lib/storage';
-import { getSupabase } from '@/lib/supabase';
 import { VIDEO_CATEGORIES } from '@/types/database';
 import { Upload as UploadIcon, Film, Image, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 
@@ -78,9 +78,6 @@ const Upload = () => {
       }
       setProgress(90);
 
-      const supabase = getSupabase();
-      if (!supabase) throw new Error('Supabase not configured');
-
       const { error: dbError } = await supabase.from('videos').insert({
         title: title.trim(),
         description: description.trim() || null,
@@ -132,11 +129,7 @@ const Upload = () => {
             </div>
           )}
 
-          {/* Video file */}
-          <div
-            onClick={() => videoRef.current?.click()}
-            className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:border-primary/40 transition-colors"
-          >
+          <div onClick={() => videoRef.current?.click()} className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:border-primary/40 transition-colors">
             <input ref={videoRef} type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleVideoSelect} className="hidden" />
             {videoFile ? (
               <div className="flex items-center gap-3 justify-center">
@@ -155,11 +148,7 @@ const Upload = () => {
             )}
           </div>
 
-          {/* Thumbnail */}
-          <div
-            onClick={() => thumbRef.current?.click()}
-            className="border border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-primary/40 transition-colors"
-          >
+          <div onClick={() => thumbRef.current?.click()} className="border border-dashed border-border rounded-xl p-4 text-center cursor-pointer hover:border-primary/40 transition-colors">
             <input ref={thumbRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleThumbSelect} className="hidden" />
             {thumbFile ? (
               <div className="flex items-center gap-3 justify-center">
