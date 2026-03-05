@@ -81,6 +81,9 @@ const Watch = () => {
       await supabase.from('likes').insert({ video_id: id, user_id: user.id });
       setLiked(true);
       setLikeCount(c => c + 1);
+      if (video?.creator_id) {
+        sendNotification(user.id, video.creator_id, 'like_video', id, 'video', 'liked your video');
+      }
     }
   };
 
