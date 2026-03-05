@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Heart, MessageSquare, Share2, User, Send, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
+import { sendNotification } from '@/hooks/useNotifications';
 
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
