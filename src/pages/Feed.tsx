@@ -10,6 +10,7 @@ import { Send, Heart, MessageSquare, User, Image as ImageIcon, Share2 } from 'lu
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 import { uploadFile, validateFile, ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from '@/lib/storage';
+import { sendNotification } from '@/hooks/useNotifications';
 
 const Feed = () => {
   const { user } = useAuth();
