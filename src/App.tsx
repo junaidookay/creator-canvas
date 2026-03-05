@@ -21,6 +21,7 @@ import PostDetail from "./pages/PostDetail";
 import NotFound from "./pages/NotFound";
 import SearchPage from "./pages/Search";
 import Notifications from "./pages/Notifications";
+import AuthCallback from "./pages/AuthCallback";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/watch/:id" element={<Watch />} />
