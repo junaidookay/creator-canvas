@@ -10,6 +10,7 @@ import AdSlot from '@/components/ads/AdSlot';
 import { ThumbsUp, Share2, Eye, Calendar, MessageSquare, User, Send, Film } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
+import { sendNotification } from '@/hooks/useNotifications';
 
 const formatCount = (n: number) => {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
