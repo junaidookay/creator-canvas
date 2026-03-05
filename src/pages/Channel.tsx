@@ -13,6 +13,7 @@ import { User, Users, Calendar, MapPin, Video, UserPlus, UserCheck, FileText, In
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 import { uploadFile, validateFile, ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from '@/lib/storage';
+import { sendNotification } from '@/hooks/useNotifications';
 
 const formatFollowers = (n: number) => {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
