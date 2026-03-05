@@ -1,9 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search, Upload, Menu, X, Settings, LogOut, User, LayoutDashboard, Rss, Sun, Moon } from 'lucide-react';
+import { Search, Upload, Menu, X, Settings, LogOut, User, LayoutDashboard, Rss, Sun, Moon, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
+import { useUnreadCount } from '@/hooks/useNotifications';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
@@ -14,6 +15,16 @@ const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const { count: unreadCount } = useUnreadCount();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (search.trim()) {
+      navigate(`/search?q=${encodeURIComponent(search.trim())}`);
+      setSearch('');
+      setMobileOpen(false);
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
@@ -25,7 +36,7 @@ const Navbar = () => {
           <span className="text-xl font-bold text-foreground tracking-tight hidden sm:block">VSTREAM</span>
         </Link>
 
-        <div className="hidden md:flex items-center flex-1 max-w-lg">
+        <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 max-w-lg">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
@@ -35,7 +46,7 @@ const Navbar = () => {
               className="w-full pl-10 pr-4 py-2 rounded-full bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
             />
           </div>
-        </div>
+        </form>
 
         <div className="hidden md:flex items-center gap-2">
           <Button
@@ -54,6 +65,14 @@ const Navbar = () => {
               </Button>
               <Button variant="ghost" size="icon" onClick={() => navigate('/upload')} className="text-muted-foreground hover:text-primary">
                 <Upload className="w-5 h-5" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => navigate('/notifications')} className="text-muted-foreground hover:text-foreground relative">
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -93,15 +112,23 @@ const Navbar = () => {
 
       {mobileOpen && (
         <div className="md:hidden bg-card border-t border-border p-4 space-y-2 animate-fade-in">
-          <div className="relative mb-3">
+          <form onSubmit={handleSearch} className="relative mb-3">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input placeholder="Search..." className="w-full pl-10 pr-4 py-2 rounded-full bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none" />
-          </div>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search..."
+              className="w-full pl-10 pr-4 py-2 rounded-full bg-secondary border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none"
+            />
+          </form>
           <Link to="/" onClick={() => setMobileOpen(false)} className="block py-2 text-foreground">Home</Link>
           <Link to="/feed" onClick={() => setMobileOpen(false)} className="block py-2 text-foreground">Feed</Link>
           {user ? (
             <>
               <Link to="/upload" onClick={() => setMobileOpen(false)} className="block py-2 text-foreground">Upload</Link>
+              <Link to="/notifications" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 py-2 text-foreground">
+                Notifications {unreadCount > 0 && <span className="px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-xs font-bold">{unreadCount}</span>}
+              </Link>
               <Link to="/profile" onClick={() => setMobileOpen(false)} className="block py-2 text-foreground">Profile</Link>
               <Link to="/settings" onClick={() => setMobileOpen(false)} className="block py-2 text-foreground">Settings</Link>
               <Link to="/admin" onClick={() => setMobileOpen(false)} className="block py-2 text-foreground">Admin</Link>

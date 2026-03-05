@@ -61,7 +61,7 @@ const Notifications = () => {
 
     if (data) {
       // Fetch actor profiles
-      const actorIds = [...new Set(data.map((n: any) => n.actor_id))];
+      const actorIds = [...new Set(data.map((n: any) => n.actor_id))] as string[];
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id, username, display_name, avatar_url')
