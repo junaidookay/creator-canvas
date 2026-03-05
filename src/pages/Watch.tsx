@@ -10,6 +10,7 @@ import AdSlot from '@/components/ads/AdSlot';
 import { ThumbsUp, Share2, Eye, Calendar, MessageSquare, User, Send, Film } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
+import { sendNotification } from '@/hooks/useNotifications';
 
 const formatCount = (n: number) => {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -80,6 +81,9 @@ const Watch = () => {
       await supabase.from('likes').insert({ video_id: id, user_id: user.id });
       setLiked(true);
       setLikeCount(c => c + 1);
+      if (video?.creator_id) {
+        sendNotification(user.id, video.creator_id, 'like_video', id, 'video', 'liked your video');
+      }
     }
   };
 
@@ -93,6 +97,9 @@ const Watch = () => {
     } else {
       setComments(prev => [data, ...prev]);
       setComment('');
+      if (video?.creator_id) {
+        sendNotification(user.id, video.creator_id, 'comment_video', id, 'video', 'commented on your video');
+      }
     }
   };
 

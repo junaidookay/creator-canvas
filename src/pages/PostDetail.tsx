@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Heart, MessageSquare, Share2, User, Send, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
+import { sendNotification } from '@/hooks/useNotifications';
 
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -63,6 +64,7 @@ const PostDetail = () => {
       await db.from('post_likes').insert({ post_id: id, user_id: user.id });
       setLiked(true);
       setLikeCount(c => c + 1);
+      if (post?.user_id) sendNotification(user.id, post.user_id, 'like_post', id, 'post', 'liked your post');
     }
   };
 
@@ -73,6 +75,7 @@ const PostDetail = () => {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
       setCommentText('');
+      if (post?.user_id) sendNotification(user.id, post.user_id, 'comment_post', id, 'post', 'commented on your post');
       fetchPost();
     }
   };
