@@ -100,6 +100,8 @@ const Feed = () => {
       await db.from('post_likes').insert({ post_id: postId, user_id: user.id });
       setLikedPosts(prev => new Set(prev).add(postId));
       setLikeCounts(prev => ({ ...prev, [postId]: (prev[postId] || 0) + 1 }));
+      const post = posts.find((p: any) => p.id === postId);
+      if (post?.user_id) sendNotification(user.id, post.user_id, 'like_post', postId, 'post', 'liked your post');
     }
   };
 
