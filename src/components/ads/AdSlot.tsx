@@ -5,7 +5,7 @@ interface AdSlotProps {
 }
 
 const AdSlot = ({ slot, format = 'auto', className = '' }: AdSlotProps) => {
-  const pubId = localStorage.getItem('vstream_adsense_pub_id');
+  const pubId = localStorage.getItem('joulecorp_adsense_pub_id');
 
   if (!pubId) return null;
 

@@ -107,7 +107,7 @@ const Upload = () => {
         <div className="text-center">
           <CheckCircle className="w-12 h-12 text-primary mx-auto mb-4" />
           <h1 className="text-xl font-bold text-foreground mb-2">Video uploaded!</h1>
-          <p className="text-muted-foreground mb-4">Your video is now live on VSTREAM.</p>
+          <p className="text-muted-foreground mb-4">Your video is now live on Joulecorp.</p>
           <div className="flex gap-3 justify-center">
             <Button onClick={() => { setSuccess(false); setVideoFile(null); setThumbFile(null); setTitle(''); setDescription(''); setCategory(''); setTags(''); }}>Upload another</Button>
             <Button variant="outline" onClick={() => navigate('/')}>Go home</Button>

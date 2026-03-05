@@ -8,7 +8,7 @@ export interface SupabaseConfig {
 }
 
 export const getSupabaseConfig = (): SupabaseConfig | null => {
-  const stored = localStorage.getItem('vstream_supabase_config');
+  const stored = localStorage.getItem('joulecorp_supabase_config');
   if (stored) {
     try {
       const config = JSON.parse(stored);
@@ -37,11 +37,11 @@ export const resetSupabaseClient = () => {
 };
 
 export const saveSupabaseConfig = (url: string, anonKey: string) => {
-  localStorage.setItem('vstream_supabase_config', JSON.stringify({ url, anonKey }));
+  localStorage.setItem('joulecorp_supabase_config', JSON.stringify({ url, anonKey }));
   resetSupabaseClient();
 };
 
 export const clearSupabaseConfig = () => {
-  localStorage.removeItem('vstream_supabase_config');
+  localStorage.removeItem('joulecorp_supabase_config');
   resetSupabaseClient();
 };

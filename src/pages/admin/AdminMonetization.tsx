@@ -22,11 +22,11 @@ const AdminMonetization = () => {
   const [slotToggles, setSlotToggles] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const storedPub = localStorage.getItem('vstream_adsense_pub_id') || '';
+    const storedPub = localStorage.getItem('joulecorp_adsense_pub_id') || '';
     setPubId(storedPub);
-    const storedGlobal = localStorage.getItem('vstream_ads_enabled');
+    const storedGlobal = localStorage.getItem('joulecorp_ads_enabled');
     setGlobalAds(storedGlobal !== 'false');
-    const storedSlots = localStorage.getItem('vstream_ad_slots');
+    const storedSlots = localStorage.getItem('joulecorp_ad_slots');
     if (storedSlots) {
       try { setSlotToggles(JSON.parse(storedSlots)); } catch { /* ignore */ }
     } else {
@@ -37,9 +37,9 @@ const AdminMonetization = () => {
   }, []);
 
   const handleSave = () => {
-    localStorage.setItem('vstream_adsense_pub_id', pubId.trim());
-    localStorage.setItem('vstream_ads_enabled', String(globalAds));
-    localStorage.setItem('vstream_ad_slots', JSON.stringify(slotToggles));
+    localStorage.setItem('joulecorp_adsense_pub_id', pubId.trim());
+    localStorage.setItem('joulecorp_ads_enabled', String(globalAds));
+    localStorage.setItem('joulecorp_ad_slots', JSON.stringify(slotToggles));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

@@ -31,9 +31,9 @@ const Navbar = () => {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2.5 shrink-0">
           <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center glow-primary">
-            <span className="text-primary-foreground font-black text-base">V</span>
+            <span className="text-primary-foreground font-black text-base">J</span>
           </div>
-          <span className="text-xl font-bold text-foreground tracking-tight hidden sm:block">VSTREAM</span>
+          <span className="text-xl font-bold text-foreground tracking-tight hidden sm:block">Joulecorp</span>
         </Link>
 
         <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 max-w-lg">

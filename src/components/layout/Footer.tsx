@@ -7,9 +7,9 @@ const Footer = () => (
         <div>
           <div className="flex items-center gap-2 mb-4">
             <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-black text-xs">V</span>
+              <span className="text-primary-foreground font-black text-xs">J</span>
             </div>
-            <span className="font-bold text-foreground">VSTREAM</span>
+            <span className="font-bold text-foreground">Joulecorp</span>
           </div>
           <p className="text-sm text-muted-foreground">Next-generation creator streaming platform.</p>
         </div>
@@ -39,7 +39,7 @@ const Footer = () => (
         </div>
       </div>
       <div className="border-t border-border pt-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} VSTREAM. All rights reserved.
+        © {new Date().getFullYear()} Joulecorp. All rights reserved.
       </div>
     </div>
   </footer>

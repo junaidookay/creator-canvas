@@ -20,7 +20,7 @@ export const validateFile = (file: File, allowedTypes: string[], maxSize: number
 };
 
 const getStorageProvider = (): StorageProvider => {
-  const stored = localStorage.getItem('vstream_storage_provider');
+  const stored = localStorage.getItem('joulecorp_storage_provider');
   return (stored as StorageProvider) || 'supabase';
 };
 

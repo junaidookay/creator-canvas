@@ -29,10 +29,10 @@ const Login = () => {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4 glow-primary">
-            <span className="text-primary-foreground font-black text-lg">V</span>
+            <span className="text-primary-foreground font-black text-lg">J</span>
           </div>
           <h1 className="text-2xl font-bold text-foreground">Welcome back</h1>
-          <p className="text-sm text-muted-foreground mt-1">Sign in to your VSTREAM account</p>
+          <p className="text-sm text-muted-foreground mt-1">Sign in to your Joulecorp account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

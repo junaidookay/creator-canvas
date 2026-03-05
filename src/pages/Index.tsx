@@ -175,7 +175,7 @@ const Index = () => {
           <div className="relative z-10">
             <Layers className="w-10 h-10 text-primary mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-foreground mb-2">Ready to share your story?</h2>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">Join creators building their audience on VSTREAM.</p>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">Join creators building their audience on Joulecorp.</p>
             <Button size="lg" className="glow-primary" asChild><Link to="/signup">Get Started Free</Link></Button>
           </div>
         </div>
