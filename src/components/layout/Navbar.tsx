@@ -33,7 +33,7 @@ const Navbar = () => {
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-slate-300 to-slate-500 flex items-center justify-center shadow-lg">
             <span className="text-slate-900 font-black text-base">J</span>
           </div>
-          <span className="text-xl font-bold text-foreground tracking-tight hidden sm:block">Joulecorp</span>
+          <span className="text-xl font-bold text-foreground tracking-tight">Joulecorp</span>
         </Link>
 
         <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 max-w-lg">
