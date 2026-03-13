@@ -27,7 +27,7 @@ const HeroSection = () => {
             Your content.{' '}
             <span className="text-gradient-primary">Your platform.</span>
           </h1>
-          <p className="text-lg text-muted-foreground mb-8 max-w-lg">
+          <p className="text-lg text-white/80 mb-8 max-w-lg">
             Upload, share, and monetize your videos on a premium streaming network built for creators.
           </p>
           <div className="flex flex-wrap gap-3">
