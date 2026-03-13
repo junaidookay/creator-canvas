@@ -157,7 +157,7 @@ const Index = () => {
           <Clock className="w-5 h-5 text-primary" />
           <h2 className="text-xl font-bold text-foreground">Latest Uploads</h2>
         </div>
-        {renderVideoGrid(latest)}
+        {renderVideoGrid(latest.slice(0, 4))}
       </section>
 
       {/* More to Explore */}
