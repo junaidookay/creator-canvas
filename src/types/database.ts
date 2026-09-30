@@ -15,7 +15,7 @@ export interface Video {
   thumbnail_url: string | null;
   video_url: string;
   video_path: string;
-  storage_type: 'supabase' | 's3' | 'r2' | 'b2' | 'local';
+  storage_type: 'supabase' | 'bunny' | 's3' | 'r2' | 'b2' | 'local';
   storage_provider_ref: string | null;
   category: string;
   tags: string[];

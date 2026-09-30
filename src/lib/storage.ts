@@ -1,6 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
+import { uploadVideoToBunny, deleteVideoFromBunny } from '@/lib/bunny';
 
-export type StorageProvider = 'supabase' | 's3' | 'r2' | 'b2' | 'local';
+export type StorageProvider = 'supabase' | 'bunny' | 's3' | 'r2' | 'b2' | 'local';
 
 export interface UploadResult {
   path: string;
@@ -35,6 +36,11 @@ export const uploadFile = async (
   switch (provider) {
     case 'supabase':
       return uploadToSupabase(file, bucket, folder, onProgress);
+    case 'bunny':
+      if (file.type.startsWith('video/')) {
+        return uploadToBunny(file, onProgress);
+      }
+      return uploadToSupabase(file, bucket, folder, onProgress);
     case 's3':
     case 'r2':
     case 'b2':
@@ -43,6 +49,14 @@ export const uploadFile = async (
     default:
       throw new Error('Unknown storage provider');
   }
+};
+
+const uploadToBunny = async (
+  file: File,
+  onProgress?: (pct: number) => void
+): Promise<UploadResult> => {
+  const result = await uploadVideoToBunny(file, file.name, onProgress);
+  return { path: result.videoId, url: result.playbackUrl, provider: 'bunny' };
 };
 
 const uploadToSupabase = async (
@@ -65,7 +79,11 @@ const uploadToSupabase = async (
   return { path: data.path, url: urlData.publicUrl, provider: 'supabase' };
 };
 
-export const deleteFile = async (path: string, bucket: string) => {
+export const deleteFile = async (path: string, bucket: string, provider?: StorageProvider) => {
+  if (provider === 'bunny') {
+    await deleteVideoFromBunny(path);
+    return;
+  }
   const { error } = await supabase.storage.from(bucket).remove([path]);
   if (error) throw error;
 };
