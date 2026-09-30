@@ -1,6 +1,6 @@
 
 -- 1. Watch history table
-CREATE TABLE public.watch_history (
+CREATE TABLE IF NOT EXISTS public.watch_history (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   video_id uuid NOT NULL REFERENCES public.videos(id) ON DELETE CASCADE,
@@ -10,6 +10,11 @@ CREATE TABLE public.watch_history (
 
 ALTER TABLE public.watch_history ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Own history read" ON public.watch_history;
+DROP POLICY IF EXISTS "Own history insert" ON public.watch_history;
+DROP POLICY IF EXISTS "Own history delete" ON public.watch_history;
+DROP POLICY IF EXISTS "Own history update" ON public.watch_history;
+
 CREATE POLICY "Own history read" ON public.watch_history FOR SELECT TO authenticated USING (auth.uid() = user_id);
 CREATE POLICY "Own history insert" ON public.watch_history FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Own history delete" ON public.watch_history FOR DELETE TO authenticated USING (auth.uid() = user_id);
@@ -17,6 +22,11 @@ CREATE POLICY "Own history update" ON public.watch_history FOR UPDATE TO authent
 
 -- 2. Avatars storage bucket
 INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true) ON CONFLICT DO NOTHING;
+
+DROP POLICY IF EXISTS "Anyone can view avatars" ON storage.objects;
+DROP POLICY IF EXISTS "Auth users upload avatars" ON storage.objects;
+DROP POLICY IF EXISTS "Users update own avatars" ON storage.objects;
+DROP POLICY IF EXISTS "Users delete own avatars" ON storage.objects;
 
 CREATE POLICY "Anyone can view avatars" ON storage.objects FOR SELECT USING (bucket_id = 'avatars');
 CREATE POLICY "Auth users upload avatars" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'avatars' AND (storage.foldername(name))[1] = auth.uid()::text);
@@ -41,9 +51,11 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- 4. Allow authenticated users to insert their own profile (fallback)
+DROP POLICY IF EXISTS "Auth insert own profile" ON public.profiles;
 CREATE POLICY "Auth insert own profile" ON public.profiles FOR INSERT TO authenticated WITH CHECK (auth.uid() = id);

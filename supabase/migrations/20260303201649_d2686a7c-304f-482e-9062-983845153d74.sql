@@ -6,7 +6,9 @@ ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS is_hidden boolean NOT NULL DEF
 ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
 
 -- Allow post authors to update/delete their own posts
+DROP POLICY IF EXISTS "Author update post" ON public.posts;
 CREATE POLICY "Author update post" ON public.posts FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Author delete post" ON public.posts;
 CREATE POLICY "Author delete post" ON public.posts FOR DELETE USING (auth.uid() = user_id);
 
 -- =============================================
@@ -19,7 +21,7 @@ ALTER TABLE public.videos ADD COLUMN IF NOT EXISTS visibility text NOT NULL DEFA
 -- =============================================
 -- 3) Post Likes table
 -- =============================================
-CREATE TABLE public.post_likes (
+CREATE TABLE IF NOT EXISTS public.post_likes (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id uuid NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
   user_id uuid NOT NULL,
@@ -29,14 +31,17 @@ CREATE TABLE public.post_likes (
 
 ALTER TABLE public.post_likes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public post likes" ON public.post_likes;
 CREATE POLICY "Public post likes" ON public.post_likes FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Auth like post" ON public.post_likes;
 CREATE POLICY "Auth like post" ON public.post_likes FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Own unlike post" ON public.post_likes;
 CREATE POLICY "Own unlike post" ON public.post_likes FOR DELETE USING (auth.uid() = user_id);
 
 -- =============================================
 -- 4) Post Comments table
 -- =============================================
-CREATE TABLE public.post_comments (
+CREATE TABLE IF NOT EXISTS public.post_comments (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id uuid NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
   user_id uuid NOT NULL,
@@ -46,14 +51,17 @@ CREATE TABLE public.post_comments (
 
 ALTER TABLE public.post_comments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public post comments" ON public.post_comments;
 CREATE POLICY "Public post comments" ON public.post_comments FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Auth post comment" ON public.post_comments;
 CREATE POLICY "Auth post comment" ON public.post_comments FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Own delete post comment" ON public.post_comments;
 CREATE POLICY "Own delete post comment" ON public.post_comments FOR DELETE USING (auth.uid() = user_id);
 
 -- =============================================
 -- 5) Reports table
 -- =============================================
-CREATE TABLE public.reports (
+CREATE TABLE IF NOT EXISTS public.reports (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   reporter_id uuid NOT NULL,
   target_type text NOT NULL CHECK (target_type IN ('video', 'post', 'comment', 'profile')),
@@ -67,8 +75,10 @@ CREATE TABLE public.reports (
 ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
 
 -- Only authenticated users can create reports
+DROP POLICY IF EXISTS "Auth create report" ON public.reports;
 CREATE POLICY "Auth create report" ON public.reports FOR INSERT WITH CHECK (auth.uid() = reporter_id);
 -- Users can see their own reports
+DROP POLICY IF EXISTS "Own reports" ON public.reports;
 CREATE POLICY "Own reports" ON public.reports FOR SELECT USING (auth.uid() = reporter_id);
 
 -- =============================================
@@ -88,19 +98,24 @@ AS $$
 $$;
 
 -- Admin/moderator can read all reports
+DROP POLICY IF EXISTS "Admin read reports" ON public.reports;
 CREATE POLICY "Admin read reports" ON public.reports FOR SELECT
   USING (public.has_role(auth.uid(), 'admin') OR public.has_role(auth.uid(), 'moderator'));
 
 -- Admin/moderator can update reports
+DROP POLICY IF EXISTS "Admin update reports" ON public.reports;
 CREATE POLICY "Admin update reports" ON public.reports FOR UPDATE
   USING (public.has_role(auth.uid(), 'admin') OR public.has_role(auth.uid(), 'moderator'));
 
 -- =============================================
 -- 7) RLS on user_roles (read for admin, own read for users)
 -- =============================================
+DROP POLICY IF EXISTS "Users read own role" ON public.user_roles;
 CREATE POLICY "Users read own role" ON public.user_roles FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Admin read all roles" ON public.user_roles;
 CREATE POLICY "Admin read all roles" ON public.user_roles FOR SELECT
   USING (public.has_role(auth.uid(), 'admin'));
+DROP POLICY IF EXISTS "Admin manage roles" ON public.user_roles;
 CREATE POLICY "Admin manage roles" ON public.user_roles FOR ALL
   USING (public.has_role(auth.uid(), 'admin'));
 
@@ -108,18 +123,22 @@ CREATE POLICY "Admin manage roles" ON public.user_roles FOR ALL
 -- 8) Admin policies for content moderation
 -- =============================================
 -- Admin can update any post (hide/unhide)
+DROP POLICY IF EXISTS "Admin update posts" ON public.posts;
 CREATE POLICY "Admin update posts" ON public.posts FOR UPDATE
   USING (public.has_role(auth.uid(), 'admin') OR public.has_role(auth.uid(), 'moderator'));
 
 -- Admin can delete any post
+DROP POLICY IF EXISTS "Admin delete posts" ON public.posts;
 CREATE POLICY "Admin delete posts" ON public.posts FOR DELETE
   USING (public.has_role(auth.uid(), 'admin') OR public.has_role(auth.uid(), 'moderator'));
 
 -- Admin can update any video (disable/feature)
+DROP POLICY IF EXISTS "Admin update videos" ON public.videos;
 CREATE POLICY "Admin update videos" ON public.videos FOR UPDATE
   USING (public.has_role(auth.uid(), 'admin') OR public.has_role(auth.uid(), 'moderator'));
 
 -- Admin can delete any video
+DROP POLICY IF EXISTS "Admin delete videos" ON public.videos;
 CREATE POLICY "Admin delete videos" ON public.videos FOR DELETE
   USING (public.has_role(auth.uid(), 'admin') OR public.has_role(auth.uid(), 'moderator'));
 
@@ -144,6 +163,9 @@ CREATE INDEX IF NOT EXISTS idx_subscriptions_follower ON public.subscriptions(fo
 INSERT INTO storage.buckets (id, name, public) VALUES ('post-images', 'post-images', true)
 ON CONFLICT (id) DO NOTHING;
 
+DROP POLICY IF EXISTS "Anyone can view post images" ON storage.objects;
 CREATE POLICY "Anyone can view post images" ON storage.objects FOR SELECT USING (bucket_id = 'post-images');
+DROP POLICY IF EXISTS "Auth users upload post images" ON storage.objects;
 CREATE POLICY "Auth users upload post images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'post-images' AND auth.role() = 'authenticated');
+DROP POLICY IF EXISTS "Users delete own post images" ON storage.objects;
 CREATE POLICY "Users delete own post images" ON storage.objects FOR DELETE USING (bucket_id = 'post-images' AND auth.uid()::text = (storage.foldername(name))[1]);

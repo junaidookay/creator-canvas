@@ -1,6 +1,9 @@
 
 -- 1. Videos: restrict public SELECT to non-disabled, public videos
 DROP POLICY IF EXISTS "Public videos" ON public.videos;
+DROP POLICY IF EXISTS "Public videos visible" ON public.videos;
+DROP POLICY IF EXISTS "Creators read own videos" ON public.videos;
+DROP POLICY IF EXISTS "Admins read all videos" ON public.videos;
 
 CREATE POLICY "Public videos visible"
 ON public.videos FOR SELECT
@@ -19,6 +22,9 @@ USING (has_role(auth.uid(), 'admin'::app_role) OR has_role(auth.uid(), 'moderato
 
 -- 2. Posts: hide is_hidden posts from public; authors & admins still see them
 DROP POLICY IF EXISTS "Public posts" ON public.posts;
+DROP POLICY IF EXISTS "Public posts visible" ON public.posts;
+DROP POLICY IF EXISTS "Authors read own posts" ON public.posts;
+DROP POLICY IF EXISTS "Admins read all posts" ON public.posts;
 
 CREATE POLICY "Public posts visible"
 ON public.posts FOR SELECT
@@ -53,22 +59,18 @@ AS $$
     AND _recipient IS NOT NULL
     AND _actor <> _recipient
     AND (
-      -- follow notification: actor must actually follow recipient
       (_type = 'follow' AND EXISTS (
          SELECT 1 FROM public.subscriptions
          WHERE follower_id = _actor AND creator_id = _recipient
       ))
-      -- video interactions: recipient must own the target video
       OR (_target_type = 'video' AND EXISTS (
          SELECT 1 FROM public.videos
          WHERE id = _target_id AND creator_id = _recipient
       ))
-      -- post interactions: recipient must own the target post
       OR (_target_type = 'post' AND EXISTS (
          SELECT 1 FROM public.posts
          WHERE id = _target_id AND user_id = _recipient
       ))
-      -- comment reply: recipient must own the target comment
       OR (_target_type = 'comment' AND EXISTS (
          SELECT 1 FROM public.comments
          WHERE id = _target_id AND user_id = _recipient
@@ -102,6 +104,13 @@ WITH CHECK (
 );
 
 -- 5. Storage: videos & thumbnails owner-scoped write/update/delete
+DROP POLICY IF EXISTS "Auth upload own videos" ON storage.objects;
+DROP POLICY IF EXISTS "Auth update own videos" ON storage.objects;
+DROP POLICY IF EXISTS "Auth delete own videos" ON storage.objects;
+DROP POLICY IF EXISTS "Auth upload own thumbnails" ON storage.objects;
+DROP POLICY IF EXISTS "Auth update own thumbnails" ON storage.objects;
+DROP POLICY IF EXISTS "Auth delete own thumbnails" ON storage.objects;
+
 CREATE POLICY "Auth upload own videos"
 ON storage.objects FOR INSERT
 TO authenticated

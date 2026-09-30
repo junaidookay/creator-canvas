@@ -25,6 +25,11 @@ DROP POLICY IF EXISTS "Anyone can view thumbnails" ON storage.objects;
 DROP POLICY IF EXISTS "Anyone can view post images" ON storage.objects;
 DROP POLICY IF EXISTS "Anyone can view avatars" ON storage.objects;
 
+DROP POLICY IF EXISTS "Public fetch videos by name" ON storage.objects;
+DROP POLICY IF EXISTS "Public fetch thumbnails by name" ON storage.objects;
+DROP POLICY IF EXISTS "Public fetch post-images by name" ON storage.objects;
+DROP POLICY IF EXISTS "Public fetch avatars by name" ON storage.objects;
+
 -- Fetch-by-name only: request must include the object name, so bulk listing returns nothing
 CREATE POLICY "Public fetch videos by name"
   ON storage.objects FOR SELECT

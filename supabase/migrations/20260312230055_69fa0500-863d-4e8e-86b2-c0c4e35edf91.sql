@@ -28,8 +28,11 @@ INSERT INTO profiles (id, username, display_name, bio) VALUES
   ('a1b2c3d4-e5f6-7890-abcd-ef1234567805', 'musicmix', 'Music Mix Daily', 'Daily music mixes and artist spotlights.')
 ON CONFLICT (id) DO NOTHING;
 
--- Insert 12 sample videos
-INSERT INTO videos (title, description, video_url, video_path, creator_id, category, tags, views, visibility, is_featured, thumbnail_url) VALUES
+-- Insert 12 sample videos (idempotent: only if no sample videos exist yet)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM videos WHERE video_path LIKE 'samples/%') THEN
+    INSERT INTO videos (title, description, video_url, video_path, creator_id, category, tags, views, visibility, is_featured, thumbnail_url) VALUES
   ('The Future of Artificial Intelligence', 'An in-depth look at how AI is transforming industries.', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 'samples/ai.mp4', 'a1b2c3d4-e5f6-7890-abcd-ef1234567801', 'Technology', ARRAY['AI','technology','future'], 15420, 'public', true, 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=640&q=80'),
   ('Stunning Mountain Landscapes in 4K', 'Breathtaking mountain footage for relaxation.', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', 'samples/mountains.mp4', 'a1b2c3d4-e5f6-7890-abcd-ef1234567802', 'Travel', ARRAY['nature','mountains','4K'], 8340, 'public', true, 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=640&q=80'),
   ('Learn React in 30 Minutes', 'A quick crash course on React fundamentals.', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', 'samples/react.mp4', 'a1b2c3d4-e5f6-7890-abcd-ef1234567803', 'Education', ARRAY['react','programming','tutorial'], 23100, 'public', true, 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=640&q=80'),
@@ -42,3 +45,5 @@ INSERT INTO videos (title, description, video_url, video_path, creator_id, categ
   ('Electronic Music Production Basics', 'Learn electronic music production fundamentals.', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', 'samples/music-prod.mp4', 'a1b2c3d4-e5f6-7890-abcd-ef1234567805', 'Music', ARRAY['music','production','electronic'], 7200, 'public', false, 'https://images.unsplash.com/photo-1598488035139-bdbb2231cb64?w=640&q=80'),
   ('Morning Yoga Flow – 15 Minutes', 'Energizing 15-minute yoga for all levels.', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4', 'samples/yoga.mp4', 'a1b2c3d4-e5f6-7890-abcd-ef1234567804', 'Fitness', ARRAY['yoga','fitness','wellness'], 14300, 'public', false, 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=640&q=80'),
   ('Gaming Setup Tour 2025', 'Complete tour of my ultimate gaming setup.', 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4', 'samples/gaming.mp4', 'a1b2c3d4-e5f6-7890-abcd-ef1234567801', 'Gaming', ARRAY['gaming','setup','PC'], 28900, 'public', false, 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=640&q=80');
+  END IF;
+END $$;

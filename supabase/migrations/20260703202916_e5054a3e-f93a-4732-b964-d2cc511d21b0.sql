@@ -23,6 +23,11 @@ GRANT ALL ON public.platform_settings TO service_role;
 
 ALTER TABLE public.platform_settings ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Anyone can read platform settings" ON public.platform_settings;
+DROP POLICY IF EXISTS "Admins can insert platform settings" ON public.platform_settings;
+DROP POLICY IF EXISTS "Admins can update platform settings" ON public.platform_settings;
+DROP POLICY IF EXISTS "Admins can delete platform settings" ON public.platform_settings;
+
 CREATE POLICY "Anyone can read platform settings"
   ON public.platform_settings FOR SELECT
   USING (true);

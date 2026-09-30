@@ -17,6 +17,11 @@ GRANT ALL ON public.storage_provider_config TO service_role;
 
 ALTER TABLE public.storage_provider_config ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can read storage config" ON public.storage_provider_config;
+DROP POLICY IF EXISTS "Admins can insert storage config" ON public.storage_provider_config;
+DROP POLICY IF EXISTS "Admins can update storage config" ON public.storage_provider_config;
+DROP POLICY IF EXISTS "Admins can delete storage config" ON public.storage_provider_config;
+
 CREATE POLICY "Admins can read storage config"
   ON public.storage_provider_config FOR SELECT
   TO authenticated
