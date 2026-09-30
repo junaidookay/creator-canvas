@@ -1,4 +1,7 @@
 
+-- Ensure pgcrypto for crypt()/gen_salt()
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Create sample auth users for seeding (migrations run as superuser)
 INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, created_at, updated_at, confirmation_token, raw_app_meta_data, raw_user_meta_data)
 VALUES
