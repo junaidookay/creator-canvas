@@ -4,12 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import VideoCard from '@/components/video/VideoCard';
 import AdSlot from '@/components/ads/AdSlot';
-import { User, Users, Calendar, MapPin, Video, UserPlus, UserCheck, FileText, Info, MessageSquare, Heart, Send, Image as ImageIcon } from 'lucide-react';
+import { User, Users, Calendar, Video, UserPlus, UserCheck, FileText, Home, MessageSquare, Heart, Send, Image as ImageIcon, Zap, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 import { uploadFile, validateFile, ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from '@/lib/storage';
@@ -27,6 +26,7 @@ const Channel = () => {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [videos, setVideos] = useState<any[]>([]);
+  const [shorts, setShorts] = useState<any[]>([]);
   const [posts, setPosts] = useState<any[]>([]);
   const [followerCount, setFollowerCount] = useState(0);
   const [following, setFollowing] = useState(false);
@@ -45,17 +45,20 @@ const Channel = () => {
     if (!prof) { setLoading(false); return; }
     setProfile(prof);
 
+    const db = supabase as any;
     const [
-      { data: vids },
+      { data: allVids },
       { data: postsData },
       { count: followers },
     ] = await Promise.all([
-      supabase.from('videos').select('*').eq('creator_id', prof.id).eq('is_disabled', false).order('created_at', { ascending: false }),
+      db.from('videos').select('*').eq('creator_id', prof.id).eq('is_disabled', false).order('created_at', { ascending: false }),
       supabase.from('posts').select('*').eq('user_id', prof.id).eq('is_hidden', false).order('created_at', { ascending: false }),
       supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('creator_id', prof.id),
     ]);
 
-    setVideos(vids ?? []);
+    const allVideos = allVids ?? [];
+    setVideos(allVideos.filter((v: any) => !v.is_short));
+    setShorts(allVideos.filter((v: any) => v.is_short));
     setPosts(postsData ?? []);
     setFollowerCount(followers ?? 0);
 
@@ -175,7 +178,7 @@ const Channel = () => {
             {profile.bio && <p className="text-sm text-foreground/70 mb-4 max-w-lg">{profile.bio}</p>}
             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {formatFollowers(followerCount)} followers</span>
-              <span className="flex items-center gap-1"><Video className="w-4 h-4" /> {videos.length} videos</span>
+              <span className="flex items-center gap-1"><Video className="w-4 h-4" /> {videos.length + shorts.length} videos</span>
               <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> Joined {profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—'}</span>
             </div>
           </div>
@@ -183,13 +186,84 @@ const Channel = () => {
 
         <AdSlot slot="channel-top" format="horizontal" className="mb-8" />
 
-        <Tabs defaultValue="videos" className="mb-16">
+        <Tabs defaultValue="home" className="mb-16">
           <TabsList className="bg-secondary/50 mb-6">
+            <TabsTrigger value="home" className="gap-1.5"><Home className="w-4 h-4" /> Home</TabsTrigger>
             <TabsTrigger value="videos" className="gap-1.5"><Video className="w-4 h-4" /> Videos</TabsTrigger>
+            <TabsTrigger value="shorts" className="gap-1.5"><Zap className="w-4 h-4" /> Shorts</TabsTrigger>
             <TabsTrigger value="posts" className="gap-1.5"><FileText className="w-4 h-4" /> Posts</TabsTrigger>
-            <TabsTrigger value="about" className="gap-1.5"><Info className="w-4 h-4" /> About</TabsTrigger>
           </TabsList>
 
+          {/* HOME TAB */}
+          <TabsContent value="home">
+            <div className="space-y-10">
+              {/* Featured / recent videos */}
+              {videos.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2"><Play className="w-5 h-5 text-primary" /> Recent Videos</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {videos.slice(0, 6).map(v => (
+                      <VideoCard key={v.id} id={v.id} title={v.title} thumbnail={v.thumbnail_url} creator={profile.display_name || profile.username} views={formatFollowers(v.views || 0)} date={new Date(v.created_at).toLocaleDateString()} category={v.category} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recent shorts */}
+              {shorts.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2"><Zap className="w-5 h-5 text-primary" /> Shorts</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    {shorts.slice(0, 5).map(v => (
+                      <Link key={v.id} to={`/watch/${v.id}`} className="group">
+                        <div className="aspect-[9/16] rounded-xl overflow-hidden bg-secondary relative">
+                          {v.thumbnail_url ? (
+                            <img src={v.thumbnail_url} alt={v.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center"><Zap className="w-8 h-8 text-muted-foreground" /></div>
+                          )}
+                          <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
+                            <p className="text-white text-xs font-medium line-clamp-2">{v.title}</p>
+                            <p className="text-white/60 text-[10px]">{formatFollowers(v.views || 0)} views</p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Recent posts */}
+              {posts.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-primary" /> Recent Posts</h3>
+                  <div className="space-y-4 max-w-2xl">
+                    {posts.slice(0, 3).map(post => (
+                      <div key={post.id} className="rounded-xl bg-card border border-border p-5">
+                        <p className="text-foreground mb-3 whitespace-pre-wrap text-sm">{post.content}</p>
+                        {post.image_url && <img src={post.image_url} alt="" className="rounded-lg w-full max-h-80 object-cover mb-3" />}
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                          <Link to={`/post/${post.id}`} className="flex items-center gap-1 hover:text-primary transition-colors">
+                            <MessageSquare className="w-3.5 h-3.5" /> View
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {videos.length === 0 && shorts.length === 0 && posts.length === 0 && (
+                <div className="text-center py-16 text-muted-foreground">
+                  <Home className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                  <p>This channel hasn't posted any content yet.</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* VIDEOS TAB */}
           <TabsContent value="videos">
             {videos.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -205,8 +279,36 @@ const Channel = () => {
             )}
           </TabsContent>
 
+          {/* SHORTS TAB */}
+          <TabsContent value="shorts">
+            {shorts.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                {shorts.map(v => (
+                  <Link key={v.id} to={`/watch/${v.id}`} className="group">
+                    <div className="aspect-[9/16] rounded-xl overflow-hidden bg-secondary relative">
+                      {v.thumbnail_url ? (
+                        <img src={v.thumbnail_url} alt={v.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center"><Zap className="w-8 h-8 text-muted-foreground" /></div>
+                      )}
+                      <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
+                        <p className="text-white text-xs font-medium line-clamp-2">{v.title}</p>
+                        <p className="text-white/60 text-[10px]">{formatFollowers(v.views || 0)} views</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 text-muted-foreground">
+                <Zap className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                <p>No shorts yet.</p>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* POSTS TAB */}
           <TabsContent value="posts">
-            {/* Post composer for channel owner */}
             {isOwner && (
               <div className="bg-card rounded-xl border border-border p-4 mb-6 max-w-2xl">
                 <Textarea value={newPostText} onChange={e => setNewPostText(e.target.value)} placeholder="Share an update with your community..." rows={3} maxLength={2000} className="mb-3" />
@@ -244,27 +346,6 @@ const Channel = () => {
                 <p>No posts yet.</p>
               </div>
             )}
-          </TabsContent>
-
-          <TabsContent value="about">
-            <div className="max-w-2xl rounded-xl bg-card border border-border p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-4">About {profile.display_name || profile.username}</h3>
-              <p className="text-foreground/70 whitespace-pre-line leading-relaxed">{profile.bio || 'No bio yet.'}</p>
-              <div className="mt-6 pt-4 border-t border-border grid grid-cols-2 sm:grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-xl font-bold text-foreground">{formatFollowers(followerCount)}</p>
-                  <p className="text-xs text-muted-foreground">Followers</p>
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-foreground">{videos.length}</p>
-                  <p className="text-xs text-muted-foreground">Videos</p>
-                </div>
-                <div>
-                  <p className="text-xl font-bold text-foreground">{profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—'}</p>
-                  <p className="text-xs text-muted-foreground">Joined</p>
-                </div>
-              </div>
-            </div>
           </TabsContent>
         </Tabs>
       </div>

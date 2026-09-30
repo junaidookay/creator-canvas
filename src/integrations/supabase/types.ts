@@ -108,6 +108,27 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           content: string
@@ -262,6 +283,39 @@ export type Database = {
         }
         Relationships: []
       }
+      storage_provider_config: {
+        Row: {
+          bunny_api_key: string | null
+          bunny_cdn_hostname: string | null
+          bunny_library_id: string | null
+          default_provider: string
+          id: boolean
+          updated_at: string
+          updated_by: string | null
+          vimeo_access_token: string | null
+        }
+        Insert: {
+          bunny_api_key?: string | null
+          bunny_cdn_hostname?: string | null
+          bunny_library_id?: string | null
+          default_provider?: string
+          id?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          vimeo_access_token?: string | null
+        }
+        Update: {
+          bunny_api_key?: string | null
+          bunny_cdn_hostname?: string | null
+          bunny_library_id?: string | null
+          default_provider?: string
+          id?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          vimeo_access_token?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string | null
@@ -310,6 +364,10 @@ export type Database = {
           id: string
           is_disabled: boolean
           is_featured: boolean
+          is_short: boolean
+          provider_playback_url: string | null
+          provider_video_id: string | null
+          storage_provider: string
           storage_provider_ref: string | null
           storage_type: string | null
           tags: string[] | null
@@ -328,6 +386,10 @@ export type Database = {
           id?: string
           is_disabled?: boolean
           is_featured?: boolean
+          is_short?: boolean
+          provider_playback_url?: string | null
+          provider_video_id?: string | null
+          storage_provider?: string
           storage_provider_ref?: string | null
           storage_type?: string | null
           tags?: string[] | null
@@ -346,6 +408,10 @@ export type Database = {
           id?: string
           is_disabled?: boolean
           is_featured?: boolean
+          is_short?: boolean
+          provider_playback_url?: string | null
+          provider_video_id?: string | null
+          storage_provider?: string
           storage_provider_ref?: string | null
           storage_type?: string | null
           tags?: string[] | null
@@ -366,18 +432,41 @@ export type Database = {
           },
         ]
       }
+      watch_history: {
+        Row: {
+          id: string
+          user_id: string
+          video_id: string
+          watched_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          video_id: string
+          watched_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          video_id?: string
+          watched_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watch_history_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

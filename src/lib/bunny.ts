@@ -4,32 +4,6 @@ export interface BunnyConfig {
   cdnHost: string;
 }
 
-const STORAGE_KEYS = {
-  libraryId: 'bunny_library_id',
-  apiKey: 'bunny_api_key',
-  cdnHost: 'bunny_cdn_host',
-} as const;
-
-export const getBunnyConfig = (): BunnyConfig | null => {
-  const libraryId = localStorage.getItem(STORAGE_KEYS.libraryId);
-  const apiKey = localStorage.getItem(STORAGE_KEYS.apiKey);
-  const cdnHost = localStorage.getItem(STORAGE_KEYS.cdnHost);
-  if (!libraryId || !apiKey || !cdnHost) return null;
-  return { libraryId, apiKey, cdnHost };
-};
-
-export const saveBunnyConfig = (config: BunnyConfig): void => {
-  localStorage.setItem(STORAGE_KEYS.libraryId, config.libraryId);
-  localStorage.setItem(STORAGE_KEYS.apiKey, config.apiKey);
-  localStorage.setItem(STORAGE_KEYS.cdnHost, config.cdnHost);
-};
-
-export const clearBunnyConfig = (): void => {
-  localStorage.removeItem(STORAGE_KEYS.libraryId);
-  localStorage.removeItem(STORAGE_KEYS.apiKey);
-  localStorage.removeItem(STORAGE_KEYS.cdnHost);
-};
-
 const BUNNY_API_BASE = 'https://video.bunnycdn.com';
 
 export interface BunnyUploadResult {
@@ -40,13 +14,9 @@ export interface BunnyUploadResult {
 export const uploadVideoToBunny = async (
   file: File,
   title: string,
+  config: BunnyConfig,
   onProgress?: (pct: number) => void
 ): Promise<BunnyUploadResult> => {
-  const config = getBunnyConfig();
-  if (!config) {
-    throw new Error('Bunny Stream is not configured. Set up in Admin Settings \u2192 Storage.');
-  }
-
   onProgress?.(0);
 
   const createResponse = await fetch(`${BUNNY_API_BASE}/library/${config.libraryId}/videos`, {
@@ -100,18 +70,7 @@ export const uploadVideoToBunny = async (
 };
 
 export const deleteVideoFromBunny = async (videoId: string): Promise<void> => {
-  const config = getBunnyConfig();
-  if (!config) throw new Error('Bunny Stream is not configured.');
-
-  const response = await fetch(`${BUNNY_API_BASE}/library/${config.libraryId}/videos/${videoId}`, {
-    method: 'DELETE',
-    headers: {
-      'AccessKey': config.apiKey,
-      'Accept': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Bunny: failed to delete video (${response.status}).`);
-  }
+  // Delete requires server-side credentials. Use the storage-admin edge
+  // function pattern or the Bunny dashboard until a delete endpoint exists.
+  throw new Error(`Bunny: delete of video ${videoId} is not yet supported via the app. Use the Bunny dashboard.`);
 };

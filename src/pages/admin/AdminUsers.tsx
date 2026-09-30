@@ -27,7 +27,8 @@ const AdminUsers = () => {
     let query = supabase.from('profiles').select('*', { count: 'exact' });
 
     if (search.trim()) {
-      query = query.or(`username.ilike.%${search}%,display_name.ilike.%${search}%`);
+      const safe = search.trim().replace(/[,()*\\%_]/g, ' ').slice(0, 100);
+      query = query.or(`username.ilike.%${safe}%,display_name.ilike.%${safe}%`);
     }
 
     const { data, count } = await query

@@ -45,7 +45,8 @@ const Search = () => {
       .eq('visibility', 'public');
 
     if (query.trim()) {
-      q = q.or(`title.ilike.%${query.trim()}%,description.ilike.%${query.trim()}%`);
+      const safe = query.trim().replace(/[,()*\\%_]/g, ' ').slice(0, 100);
+      q = q.or(`title.ilike.%${safe}%,description.ilike.%${safe}%`);
     }
 
     if (category && category !== 'all') {

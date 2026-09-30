@@ -7,9 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { uploadFile, validateFile, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES, MAX_VIDEO_SIZE, MAX_IMAGE_SIZE } from '@/lib/storage';
+import { Switch } from '@/components/ui/switch';
+import { uploadVideo, uploadThumbnail, validateFile, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES, MAX_VIDEO_SIZE, MAX_IMAGE_SIZE } from '@/lib/storage';
 import { VIDEO_CATEGORIES } from '@/types/database';
-import { Upload as UploadIcon, Film, Image, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { Upload as UploadIcon, Film, Image, Loader2, AlertCircle, CheckCircle, Zap } from 'lucide-react';
 
 const Upload = () => {
   const { user } = useAuth();
@@ -23,6 +24,7 @@ const Upload = () => {
   const [tags, setTags] = useState('');
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [thumbFile, setThumbFile] = useState<File | null>(null);
+  const [isShort, setIsShort] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
@@ -70,25 +72,36 @@ const Upload = () => {
     setProgress(0);
 
     try {
-      const videoResult = await uploadFile(videoFile, 'videos', 'videos', p => setProgress(Math.round(p * 0.7)));
-      let thumbUrl = null;
+      const videoResult = await uploadVideo(
+        videoFile,
+        { title: title.trim(), description: description.trim() || undefined },
+        p => setProgress(Math.round(p * 0.7)),
+      );
+      let thumbUrl: string | null = null;
       if (thumbFile) {
-        const thumbResult = await uploadFile(thumbFile, 'thumbnails', 'thumbnails', p => setProgress(70 + Math.round(p * 0.2)));
+        const thumbResult = await uploadThumbnail(thumbFile, p =>
+          setProgress(70 + Math.round(p * 0.2)),
+        );
         thumbUrl = thumbResult.url;
       }
       setProgress(90);
 
-      const { error: dbError } = await supabase.from('videos').insert({
+      const db = supabase as any;
+      const { error: dbError } = await db.from('videos').insert({
         title: title.trim(),
         description: description.trim() || null,
         thumbnail_url: thumbUrl,
-        video_url: videoResult.url,
+        video_url: videoResult.videoUrl,
         video_path: videoResult.path,
         storage_type: videoResult.provider,
+        storage_provider: videoResult.provider,
+        provider_video_id: videoResult.providerVideoId ?? null,
+        provider_playback_url: videoResult.providerPlaybackUrl ?? null,
         category,
         tags: tags.split(',').map(t => t.trim()).filter(Boolean),
         creator_id: user.id,
         views: 0,
+        is_short: isShort,
       });
 
       if (dbError) throw dbError;
@@ -106,11 +119,11 @@ const Upload = () => {
       <div className="min-h-screen flex items-center justify-center pt-20 px-4">
         <div className="text-center">
           <CheckCircle className="w-12 h-12 text-primary mx-auto mb-4" />
-          <h1 className="text-xl font-bold text-foreground mb-2">Video uploaded!</h1>
-          <p className="text-muted-foreground mb-4">Your video is now live on Joulecorp.</p>
+          <h1 className="text-xl font-bold text-foreground mb-2">{isShort ? 'Short' : 'Video'} uploaded!</h1>
+          <p className="text-muted-foreground mb-4">Your {isShort ? 'short' : 'video'} is now live on Joulecorp.</p>
           <div className="flex gap-3 justify-center">
-            <Button onClick={() => { setSuccess(false); setVideoFile(null); setThumbFile(null); setTitle(''); setDescription(''); setCategory(''); setTags(''); }}>Upload another</Button>
-            <Button variant="outline" onClick={() => navigate('/')}>Go home</Button>
+            <Button onClick={() => { setSuccess(false); setVideoFile(null); setThumbFile(null); setTitle(''); setDescription(''); setCategory(''); setTags(''); setIsShort(false); }}>Upload another</Button>
+            <Button variant="outline" onClick={() => navigate('/profile')}>View Profile</Button>
           </div>
         </div>
       </div>
@@ -120,7 +133,7 @@ const Upload = () => {
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-2xl">
-        <h1 className="text-2xl font-bold text-foreground mb-6">Upload Video</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-6">Upload {isShort ? 'Short' : 'Video'}</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
@@ -128,6 +141,16 @@ const Upload = () => {
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" /> {error}
             </div>
           )}
+
+          {/* Short toggle */}
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border">
+            <Zap className={`w-5 h-5 ${isShort ? 'text-primary' : 'text-muted-foreground'}`} />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Upload as Short</p>
+              <p className="text-xs text-muted-foreground">Short-form vertical video (under 60 seconds)</p>
+            </div>
+            <Switch checked={isShort} onCheckedChange={setIsShort} />
+          </div>
 
           <div onClick={() => videoRef.current?.click()} className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:border-primary/40 transition-colors">
             <input ref={videoRef} type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleVideoSelect} className="hidden" />
@@ -142,7 +165,7 @@ const Upload = () => {
             ) : (
               <>
                 <UploadIcon className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm text-foreground font-medium">Click to select video</p>
+                <p className="text-sm text-foreground font-medium">Click to select {isShort ? 'short' : 'video'}</p>
                 <p className="text-xs text-muted-foreground mt-1">MP4, WebM, MOV • Max 500MB</p>
               </>
             )}
@@ -165,12 +188,12 @@ const Upload = () => {
 
           <div className="space-y-2">
             <Label>Title</Label>
-            <Input value={title} onChange={e => setTitle(e.target.value)} required placeholder="Give your video a title" maxLength={200} />
+            <Input value={title} onChange={e => setTitle(e.target.value)} required placeholder={`Give your ${isShort ? 'short' : 'video'} a title`} maxLength={200} />
           </div>
 
           <div className="space-y-2">
             <Label>Description</Label>
-            <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe your video..." rows={4} maxLength={5000} />
+            <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder={`Describe your ${isShort ? 'short' : 'video'}...`} rows={4} maxLength={5000} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -199,7 +222,7 @@ const Upload = () => {
           )}
 
           <Button type="submit" className="w-full" disabled={uploading}>
-            {uploading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading...</> : <><UploadIcon className="w-4 h-4 mr-2" /> Upload Video</>}
+            {uploading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading...</> : <><UploadIcon className="w-4 h-4 mr-2" /> Upload {isShort ? 'Short' : 'Video'}</>}
           </Button>
         </form>
       </div>

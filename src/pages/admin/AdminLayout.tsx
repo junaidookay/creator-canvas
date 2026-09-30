@@ -3,7 +3,7 @@ import { useAdminRole } from '@/hooks/useAdminRole';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Shield, LayoutDashboard, Users, Film, FileText, Flag, BarChart3, DollarSign, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Shield, LayoutDashboard, Users, Film, FileText, Flag, BarChart3, DollarSign, Settings, HardDrive, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,6 +15,7 @@ import AdminReports from './AdminReports';
 import AdminAnalytics from './AdminAnalytics';
 import AdminMonetization from './AdminMonetization';
 import AdminSettings from './AdminSettings';
+import AdminStorage from './AdminStorage';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -24,6 +25,7 @@ const TABS = [
   { id: 'reports', label: 'Reports', icon: Flag },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   { id: 'monetization', label: 'Monetization', icon: DollarSign },
+  { id: 'storage', label: 'Storage', icon: HardDrive },
   { id: 'settings', label: 'Settings', icon: Settings },
 ] as const;
 
@@ -71,6 +73,7 @@ const AdminLayout = () => {
       case 'reports': return <AdminReports />;
       case 'analytics': return <AdminAnalytics />;
       case 'monetization': return <AdminMonetization />;
+      case 'storage': return <AdminStorage />;
       case 'settings': return <AdminSettings />;
     }
   };
