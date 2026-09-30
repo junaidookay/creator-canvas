@@ -40,11 +40,24 @@ Deno.serve(async (req) => {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
     const { data: cfg } = await admin
       .from("storage_provider_config")
-      .select("default_provider, vimeo_access_token")
+      .select("default_provider, vimeo_access_token, bunny_api_key, bunny_library_id, bunny_cdn_hostname")
       .eq("id", true)
       .maybeSingle();
 
     const provider = (cfg?.default_provider as string) ?? "supabase";
+
+    if (provider === "bunny") {
+      if (!cfg?.bunny_api_key || !cfg?.bunny_library_id || !cfg?.bunny_cdn_hostname) {
+        return json({ error: "Bunny not configured" }, 500);
+      }
+      // Return Bunny upload credentials so the browser can upload directly.
+      return json({
+        provider: "bunny",
+        libraryId: cfg.bunny_library_id,
+        apiKey: cfg.bunny_api_key,
+        cdnHost: cfg.bunny_cdn_hostname,
+      });
+    }
 
     if (provider !== "vimeo") {
       // Fall back to Supabase Storage; client handles it directly.
