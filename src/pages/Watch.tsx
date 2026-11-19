@@ -210,8 +210,8 @@ const Watch = () => {
                   <Button variant={liked ? 'default' : 'outline'} size="sm" onClick={toggleLike} disabled={!user}>
                     <ThumbsUp className="w-4 h-4 mr-1" /> {likeCount}
                   </Button>
-                  <Button variant="outline" size="default" className="px-5" onClick={() => { navigator.clipboard.writeText(window.location.href); toast({ title: 'Link copied!' }); }}>
-                    <Share2 className="w-5 h-5 mr-1.5" /> Share
+                  <Button variant="outline" size="lg" className="px-6 text-base" onClick={() => { navigator.clipboard.writeText(window.location.href); toast({ title: 'Link copied!' }); }}>
+                    <Share2 className="!w-5 !h-5" /> Share
                   </Button>
                 </div>
               </div>
