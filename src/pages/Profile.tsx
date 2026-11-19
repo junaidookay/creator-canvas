@@ -264,7 +264,6 @@ const Profile = () => {
                           )}
                           <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
                             <p className="text-white text-xs font-medium line-clamp-2">{v.title}</p>
-                            <p className="text-white/60 text-[10px]">{formatCount(v.views || 0)} views</p>
                           </div>
                         </div>
                       </Link>
@@ -391,7 +390,6 @@ const Profile = () => {
                       )}
                       <div className="absolute bottom-0 inset-x-0 p-2 bg-gradient-to-t from-black/70 to-transparent">
                         <p className="text-white text-xs font-medium line-clamp-2">{v.title}</p>
-                        <p className="text-white/60 text-[10px]">{formatCount(v.views || 0)} views</p>
                       </div>
                     </div>
                   </Link>

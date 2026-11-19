@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import VideoCard from '@/components/video/VideoCard';
 import AdSlot from '@/components/ads/AdSlot';
-import { ThumbsUp, Share2, Eye, Calendar, MessageSquare, User, Send, Film, UserPlus, UserCheck } from 'lucide-react';
+import { ThumbsUp, Share2, Calendar, MessageSquare, User, Send, Film, UserPlus, UserCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from '@/hooks/use-toast';
 import { sendNotification } from '@/hooks/useNotifications';
@@ -167,7 +167,6 @@ const Watch = () => {
               <h1 className="text-xl font-bold text-foreground mb-2">{video.title}</h1>
 
               <div className="flex flex-wrap items-center gap-4 mb-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1"><Eye className="w-4 h-4" /> {formatCount(video.views || 0)} views</span>
                 <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {new Date(video.created_at).toLocaleDateString()}</span>
                 {video.category && <span className="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs">{video.category}</span>}
               </div>
@@ -211,8 +210,8 @@ const Watch = () => {
                   <Button variant={liked ? 'default' : 'outline'} size="sm" onClick={toggleLike} disabled={!user}>
                     <ThumbsUp className="w-4 h-4 mr-1" /> {likeCount}
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(window.location.href); toast({ title: 'Link copied!' }); }}>
-                    <Share2 className="w-4 h-4 mr-1" /> Share
+                  <Button variant="outline" size="default" className="px-5" onClick={() => { navigator.clipboard.writeText(window.location.href); toast({ title: 'Link copied!' }); }}>
+                    <Share2 className="w-5 h-5 mr-1.5" /> Share
                   </Button>
                 </div>
               </div>

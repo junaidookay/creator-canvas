@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Eye, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export interface VideoCardProps {
@@ -13,7 +13,7 @@ export interface VideoCardProps {
   gradient?: string;
 }
 
-const VideoCard = ({ id, title, thumbnail, creator, views, date, category, gradient }: VideoCardProps) => (
+const VideoCard = ({ id, title, thumbnail, creator, date, category, gradient }: VideoCardProps) => (
   <motion.div
     initial={{ opacity: 0, y: 12 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -39,7 +39,6 @@ const VideoCard = ({ id, title, thumbnail, creator, views, date, category, gradi
       </h3>
       <p className="text-xs text-muted-foreground mb-1">{creator}</p>
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {views}</span>
         <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {date}</span>
       </div>
     </Link>
